@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+    <meta charset="UTF-8">
+    <title>图片删除配置</title>
+    <script type="text/javascript" src="../js/jquery-3.2.1.min.js" ></script>
+    <script type="text/javascript" src="../js/popper.js"></script>
+    <script type="text/javascript" src="../bootstrap/js/bootstrap.min.js" ></script>
+    <script type="text/javascript" src="../js/config.js"></script>
+	<link rel="stylesheet" href="../bootstrap/css/bootstrap.css" />
+	<link rel="shortcut icon" href="../image/ico.ico" />
+</head>
+<body>
+	<div class="top">
+		<div class="indexPage" onclick="goIndex()" style="position: relative;float: left;cursor: pointer;">首页</div>
+		<div class="logOut" onclick="logOut()" style="position: relative;float: right;cursor: pointer;width:4%;text-align:center;">退出</div>
+	</div>
+	<div class="middle">
+		<form class="form-horizontal" style="width: 100%;">
+		  <div class="form-group" style="width: 59vh;height: 6vh;margin-bottom: 0px;">
+		    <!--<label for="inputEmail3" class="col-sm-12 control-label">请选择删除开始日期</label>-->
+		    <div class="col-lg-6" style="position: relative;   float: left;">
+	      	    开始日期<input type="datetime-local"  style="margin:10px 0px 0px 0px" class="form-control beginTime" id="inputEmail3" placeholder="" oninput="startTimeChange()">
+		      <span class="startTimeTips" style="position: relative;float: left;color: red;display: none;">请选择开始下载的时间，精确到分</span>
+		    </div>
+		    <!--<label for="inputEmail3" class="col-sm-12 control-label">请选择删除结束日期</label>-->
+		    <div class="col-lg-6" style="position: relative;   float: left;">
+		      	结束日期<input type="datetime-local" style="margin:10px 0px 0px 0px" class="form-control endTime" id="inputEmail3" placeholder="" oninput="endTimeChange()">
+		      <span class="endTimeTips" style="position: relative;float: left;color: red;display: none;">请选择结束下载的时间，精确到分</span>
+		    </div>
+		  </div>
+		</form>
+		<br />
+	</div>
+	<div class="bottom" style="margin-top: -8px;">
+		<button type="button" class="btn btn-primary" data-container="body" data-toggle="popover" data-placement="left" data-content="Vivamus sagittis lacus vel augue laoreet rutrum faucibus."
+			 style="vertical-align: baseline; margin-left: 25px; margin-top: -46px;" onclick="beginDowlad()">开始下载</button>
+	</div>
+	<div class="showModal" style="display: none;">
+		正在下载...
+	</div>
+	
+	
+	<div class="tips"> 
+		<span>tips:</span>
+		<span>
+			下载的图片，会保存在后台配置文件中配置的目录，<br />
+			且根据表名区分一级件夹，根据日期区分二级文件夹。
+		</span>
+		
+	</div>
+	<form action="logOut" id="hiddenForm"></form>
+	
+	<form action="index" id="indexForm"></form>
+</body>
+<script>
+	window.onload=function(){
+		// 探测登录时间接口
+//		setInterval(function(){
+//			$.post("/testLogin", function(data){
+//				if(data!== 'login'){
+//					$('#hiddenForm').submit();
+//				}
+//			})
+//		},2000)
+	}
+	function goIndex(){
+		$('#indexForm').submit();
+	}
+	function logOut(){
+		$('#hiddenForm').submit();
+	}
+	function beginDowlad(){
+		var b = document.getElementsByClassName('beginTime')[0]
+		var c = document.getElementsByClassName('endTime')[0]
+		var startTime = b.value
+		var endTime = c.value
+		if(startTime === ''){
+			var startTimeTips = document.getElementsByClassName("startTimeTips")[0]
+			startTimeTips.style.display='block'
+			return			
+		}else if(endTime === ''){
+			var startTimeTips = document.getElementsByClassName("endTimeTips")[0]
+			startTimeTips.style.display='block'
+			return	
+		}
+		// post发送请求 ，保存键值对，参数
+		$.post("/downloadFastImg", { startTime: startTime,endTime : endTime},
+	      function(data){
+			var showModal = document.getElementsByClassName("showModal")[0]
+			// 克隆新节点，然后显示出来
+			var newModal = showModal.cloneNode(true);
+			var body = document.getElementsByTagName("body")[0];
+			body.appendChild(newModal)
+			newModal.classList.add("newModal")
+			$(".newModal").show(500)
+			setTimeout(function(){
+				// 设置一秒后缓慢隐藏
+				$(".newModal").hide(500)
+			},1500)
+			
+			setTimeout(function(){
+			var newModal2= $(".newModal")
+			for(var i = 0 ; i < newModal2.length ; i++){
+				newModal2[i].parentNode.removeChild(newModal2[i])					
+			}
+		},2500)
+	      });
+	}
+	
+	function startTimeChange(){
+		var startTimeTips = document.getElementsByClassName("startTimeTips")[0]
+		startTimeTips.style.display='none'
+	}
+	
+	function endTimeChange(){
+		var startTimeTips = document.getElementsByClassName("endTimeTips")[0]
+		startTimeTips.style.display='none'
+	}
+</script>
+<style>
+html,body{
+	height: 100%;
+}
+body{
+	background-image: url(../image/background.png);
+	background-size: 100% 100%;
+	color: white;
+}
+.top,.middle,.bottom{
+	padding: 10px;
+}
+.top{
+	height: 5%;
+	border-bottom: 1px black solid;
+    background-color: rgba(0,0,0,0.5);
+    padding-left: 35px;
+    font-size: 20px;
+    color: white;
+    line-height: 22px;
+}
+.middle{
+    padding: 20px;
+    width: 55%;
+}	
+.bottom{
+	width: 55%;
+	margin-top: -40px;
+}
+.tips{
+	margin: 20px 20px 20px 2%;
+}
+.input{
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+    font-size: 1rem;
+    font-weight: 400;
+    color: #212529;
+    margin-top: 10px;
+    margin-left: 15px;
+	max-width: 1000px;
+    min-width: 1000px;
+    border: 1px solid black;
+    min-height: 600px;
+    max-height: 200px;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    background: #ededed;
+    padding: 15px;
+}
+.instance{
+    position: relative;
+    float: left;
+    margin-top: 0px;
+    margin-right: 10px;
+    height: 5%;
+    width: 130px;
+    background-color: #ededed;
+    border-radius: 5px;
+    border: none;
+    outline: none;
+    line-height: 38px;
+    text-align: center;
+}
+.showModal,.showCorn{
+    position: absolute;
+    width: 15%;
+    height: 5%;
+    top: 7%;
+    right: 46%;
+    background-color: #e1f3d8;
+    border: 1px solid #e1f3d8;
+    border-radius: 5px;
+    text-align: center;
+    line-height: 40px;
+    color: #67c23a;
+}
+.selectOuter{
+	width: auto;
+    position: relative;
+    float: left;
+    margin-right: 10px;
+    height: 5%;
+}
+select{
+    padding-left: 5px;
+    outline: none;
+    color: #0069d9;
+    height: 100%;
+    width: auto;
+    border: 1px #0069d9 solid;
+    border-radius: 5px;
+}
+option{
+	color: black;
+    background: white;
+    border-radius: 5px;;
+}
+select:hover{
+	background-color: #ededed;
+}
+.result{
+    width: 130px;
+    background-color: #ededed;
+    border-radius: 5px;
+    border: none;
+    outline: none;
+    height: 5%;
+    margin-top: 10px;
+    padding-left: 10px;
+    line-height: 38px;
+    text-align: center;
+}
+.logOut:hover,.indexPage:hover{
+	color: #0069d9;
+}
+
+.cornLable{
+    padding: 0px 15px;
+    width: 45vh;
+}
+/* 设置滚动条的样式 */
+::-webkit-scrollbar {
+width:0px;
+}
+/* 滚动槽 */
+::-webkit-scrollbar-track {
+-webkit-box-shadow:inset006pxrgba(0,0,0,0.3);
+border-radius:10px;
+}
+/* 滚动条滑块 */
+::-webkit-scrollbar-thumb {
+border-radius:10px;
+background:rgba(0,0,0,0.1);
+-webkit-box-shadow:inset006pxrgba(0,0,0,0.5);
+}
+::-webkit-scrollbar-thumb:window-inactive {
+background:rgba(255,0,0,0.4);
+}
+</style>
+</html>

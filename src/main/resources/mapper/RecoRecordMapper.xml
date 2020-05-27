@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.jitu.timeddeleted.dao.RecoRecordDao">
+
+  <select id="selectByStartTime" resultType="java.util.Map" parameterType="java.util.Map" statementType="STATEMENT">
+    SELECT * from ${tableName} WHERE 1 =1
+
+    <if test="startTime!=null">
+      and ${dateFiled} &gt;= ${startTime}
+    </if>
+    <if test="endTime!=null">
+      and ${dateFiled} &lt; ${endTime}
+    </if>
+    order by ${dateFiled}
+    limit ${start},${limit}
+  </select>
+
+  <select id="selectRecoCount" resultType="java.lang.Integer" statementType="STATEMENT">
+    select count(1) from ${tableName} where 1=1
+    <if test="startTime!=null">
+      and ${dateFiled} &gt;= ${startTime}
+    </if>
+    <if test="endTime!=null">
+      and ${dateFiled} &lt; ${endTime}
+    </if>
+  </select>
+
+  <delete id="deleteReco"  parameterType="java.util.Map" statementType="STATEMENT">
+    delete from ${tableName} where ${tableId} = ${idValue}
+  </delete>
+</mapper>
